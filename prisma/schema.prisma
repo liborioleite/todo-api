@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                       Int       @id @default(autoincrement())
+  name                     String
+  description              String?
+  value                    Decimal
+  quantity_stock           Int?
+  category                 String?
+  brand                    String?
+  image                    String?
+  release_date             DateTime?
+  expiration_date          DateTime?
+  technical_especification String?
+  created_at               DateTime? @default(now())
+  updated_at               DateTime? @updatedAt
+  user_id                  Int?
+  User                     User?     @relation(fields: [user_id], references: [id])
+
+  @@map("products")
+}
+
+model Task {
+  id           Int          @id @default(autoincrement())
+  task_name    String
+  description  String?
+  priority     PiorityType? @default(normal)
+  status       TaskStatus?  @default(pending)
+  started_in   DateTime?
+  completed_in DateTime?
+  user_id      Int?
+  User         User?        @relation(fields: [user_id], references: [id])
+  created_at   DateTime?    @default(now())
+  updated_at   DateTime?    @updatedAt
+
+  @@map("tasks")
+}
+
+enum PiorityType {
+  low
+  normal
+  high
+}
+
+enum TaskStatus {
+  pending
+  in_progress
+  completed
+}
+
+model User {
+  id       Int           @id @default(autoincrement())
+  name     String
+  email    String
+  password String
+  document DocumentType?
+  adress   String?
+  Product  Product[]
+  Task     Task[]
+
+  @@map("users")
+}
+
+enum DocumentType {
+  cpf
+  cnpj
+}
