@@ -5,13 +5,17 @@ import {
   Post,
   Req,
   Res,
+  Headers,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDTO } from 'src/dtos/auth.login.dto';
 import { Request, Response } from 'express';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { UserService } from 'src/user/user.service';
+import { IsLongitude } from 'class-validator';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -58,19 +62,38 @@ export class AuthController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Post('profile')
-  async profile(@Body() data, @Res() res: Response) {
-    try {
-      const token = await this.authService.checkToken(data.token);
+  async profile(@Req() req) {
 
-      if (!token) {
-        return res.status(401).json({ error: 'Não autorizado.' });
-      }
 
-      return res.status(200).json(token);
-    } catch (err) {
-      console.log(err);
-      return null
-    }
+    return {profile:'ok',data:req.token_payload}
+
+
+    // try {
+    //   // return await this.authService.checkToken();
+    //   const token = await this.authService.checkToken(
+    //     (access_token ?? '').split(' ')[1],
+    //   );
+
+    //   console.log(access_token);
+
+    //   console.log(token);
+
+    //   if (!token) {
+    //     return res.status(401).json({
+    //       error: 'Erro ao realizar requisição.',
+    //       cause: 'Não autorizado.',
+    //     });
+    //   }
+
+    //   return res.status(200).json(token);
+    // } catch (err) {
+    //   console.log(err);
+    //   return res.status(401).json({
+    //     error: 'Erro ao realizar requisição.',
+    //     cause: `${err}`,
+    //   });
+    // }
   }
 }
