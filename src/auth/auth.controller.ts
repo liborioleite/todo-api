@@ -14,7 +14,6 @@ import { AuthLoginDTO } from 'src/dtos/auth.login.dto';
 import { Request, Response } from 'express';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { UserService } from 'src/user/user.service';
-import { IsLongitude } from 'class-validator';
 import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')

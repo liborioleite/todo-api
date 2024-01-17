@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { hashSync } from 'bcrypt';
+import { CreateTaskDTO } from 'src/dtos/create.task.dto';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async register(data: CreateUserDTO) {
     try {
@@ -30,6 +32,35 @@ export class UserService {
     } catch (err) {
       console.log(err);
       return null;
+    }
+  }
+
+  async createTask(data: CreateTaskDTO) {
+
+    try {
+      const task = await this.prisma.task.findFirst({
+        where: {
+          task_name: data.task_name,
+        }
+      })
+
+      if (task) {
+        return null
+      }
+
+      return await this.prisma.task.create({
+        data: {
+          task_name: data.task_name,
+          description: data.description,
+          priority: data.priority,
+          started_in: new Date(),
+          status: data.status,
+        }
+      })
+
+    } catch (err) {
+      console.log(err)
+      return null
     }
   }
 }

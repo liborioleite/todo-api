@@ -14,7 +14,7 @@ model Product {
   id                       Int       @id @default(autoincrement())
   name                     String
   description              String?
-  value                    Decimal
+  value                    Decimal @db.Decimal(3,2)
   quantity_stock           Int?
   category                 String?
   brand                    String?
@@ -31,22 +31,22 @@ model Product {
 }
 
 model Task {
-  id           Int          @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   task_name    String
   description  String?
-  priority     PiorityType? @default(normal)
-  status       TaskStatus?  @default(pending)
+  priority     PriorityType? @default(normal)
+  status       TaskStatus?   @default(pending)
   started_in   DateTime?
   completed_in DateTime?
   user_id      Int?
-  User         User?        @relation(fields: [user_id], references: [id])
-  created_at   DateTime?    @default(now())
-  updated_at   DateTime?    @updatedAt
+  User         User?         @relation(fields: [user_id], references: [id])
+  created_at   DateTime?     @default(now())
+  updated_at   DateTime?     @updatedAt
 
   @@map("tasks")
 }
 
-enum PiorityType {
+enum PriorityType {
   low
   normal
   high

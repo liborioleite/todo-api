@@ -5,19 +5,16 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { compareSync, hashSync } from 'bcrypt';
 import { AuthLoginDTO } from 'src/dtos/auth.login.dto';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
-    private readonly userService: UserService,
-  ) {}
+  ) { }
 
   async register(data: CreateUserDTO) {
     try {
