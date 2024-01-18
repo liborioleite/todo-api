@@ -17,7 +17,6 @@ export class UserController {
   @Post('register')
   async register(
     @Body() data: CreateUserDTO,
-    @Req() req: Request,
     @Res() res: Response,
   ) {
     const user = await this.userService.register(data);
@@ -34,13 +33,12 @@ export class UserController {
     });
   }
 
-  @UseGuards(AuthGuard)
   @Post('create-task')
   async createTask(@Body() data: CreateTaskDTO,
     @Req() req: Request,
     @Res() res: Response,) {
 
-    const task = await this.userService.createTask(data)
+    const task = await this.userService.createTask(data,req.user)
 
     if (!task) {
       return res.status(403).json({ error: 'Erro ao criar tarefa.' })

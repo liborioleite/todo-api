@@ -35,12 +35,35 @@ export class UserService {
     }
   }
 
-  async createTask(data: CreateTaskDTO) {
+  async show(id: number) {
+    try {
+      const user = await this.prisma.user.findFirstOrThrow({
+        where: {
+          id: id
+        }
+      })
+
+      if (!user) {
+        return null
+      }
+
+      return user
+    } catch (err) {
+      console.log(err);
+      return null
+    }
+  }
+
+  async createTask(data: CreateTaskDTO, user: User) {
 
     try {
+
+      console.log(user);
+
       const task = await this.prisma.task.findFirst({
         where: {
           task_name: data.task_name,
+          user_id: user.id
         }
       })
 
@@ -55,6 +78,7 @@ export class UserService {
           priority: data.priority,
           started_in: new Date(),
           status: data.status,
+          user_id: user.id
         }
       })
 

@@ -15,14 +15,16 @@ import { Request, Response } from 'express';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Public } from 'src/decorators/SetMetadata';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
+  @Public()
   @Post('login')
   async login(
     @Body() data: AuthLoginDTO,
@@ -61,38 +63,12 @@ export class AuthController {
     });
   }
 
-  @UseGuards(AuthGuard)
   @Post('profile')
-  async profile(@Req() req) {
+  async profile(@Req() req: Request) {
 
+    console.log(req.user);
+    
+    return req.user
 
-    return {profile:'ok',data:req.token_payload}
-
-
-    // try {
-    //   // return await this.authService.checkToken();
-    //   const token = await this.authService.checkToken(
-    //     (access_token ?? '').split(' ')[1],
-    //   );
-
-    //   console.log(access_token);
-
-    //   console.log(token);
-
-    //   if (!token) {
-    //     return res.status(401).json({
-    //       error: 'Erro ao realizar requisição.',
-    //       cause: 'Não autorizado.',
-    //     });
-    //   }
-
-    //   return res.status(200).json(token);
-    // } catch (err) {
-    //   console.log(err);
-    //   return res.status(401).json({
-    //     error: 'Erro ao realizar requisição.',
-    //     cause: `${err}`,
-    //   });
-    // }
   }
 }
