@@ -87,4 +87,23 @@ export class UserService {
       return null
     }
   }
+
+  async indexTask(user: User) {
+    try {
+      const tasks = await this.prisma.task.findMany({
+        where: {
+          user_id: user.id,
+        }
+      })
+
+      if (!tasks) {
+        return null
+      }
+
+      return tasks
+    } catch (err) {
+      console.log(err);
+      return null
+    }
+  }
 }

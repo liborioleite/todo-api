@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { Request, Response } from 'express';
@@ -38,12 +38,26 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,) {
 
-    const task = await this.userService.createTask(data,req.user)
+    const task = await this.userService.createTask(data, req.user)
 
     if (!task) {
       return res.status(403).json({ error: 'Erro ao criar tarefa.' })
     }
 
     return res.status(200).json({ message: 'Tarefa criada com sucesso.' })
+  }
+
+  @Get('all-tasks')
+  async listTasks(@Req() req: Request,
+    @Res() res: Response) {
+
+    const tasks = await this.userService.indexTask(req.user)
+
+    if (!tasks) {
+      return res.status(403).json({ error: 'Erro ao listar tarefas.' })
+    }
+
+    return res.status(200).json(tasks)
+
   }
 }
