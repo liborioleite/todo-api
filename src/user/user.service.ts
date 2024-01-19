@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { hashSync } from 'bcrypt';
 import { CreateTaskDTO } from 'src/dtos/create.task.dto';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
+import { UpdateTaskDTO } from 'src/dtos/update.task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -101,6 +101,86 @@ export class UserService {
       }
 
       return tasks
+    } catch (err) {
+      console.log(err);
+      return null
+    }
+  }
+
+  async showTask(id: number, user: User) {
+    try {
+      const task = await this.prisma.task.findFirst({
+        where: {
+          id: id,
+          user_id: user.id,
+        },
+        include: {
+          User: true
+        }
+      })
+
+      if (!task) {
+        console.log("Não há task cadastrada para esse usuário");
+        return null
+      }
+
+      return task;
+    } catch (err) {
+      console.log(err);
+      return null
+    }
+  }
+
+  async patchTask(id: number, user: User, data: UpdateTaskDTO) {
+    try {
+      const task = await this.prisma.task.findFirst({
+        where: {
+          id: id,
+          user_id: user.id
+        }
+      })
+
+      if (!task) {
+        return null
+      }
+
+      return await this.prisma.task.update({
+        where: {
+          id: id,
+          user_id: user.id
+        },
+        data: {
+          task_name: data.task_name,
+          description: data.description,
+          priority: data.priority,
+          status: data.status,
+        }
+      })
+    } catch (err) {
+      console.log(err);
+      return null
+    }
+  }
+
+  async deleteTask(id: number, user: User) {
+    try {
+      const task = await this.prisma.task.findFirst({
+        where: {
+          id: id,
+          user_id: user.id
+        }
+      })
+
+      if (!task) {
+        return null
+      }
+
+      return await this.prisma.task.delete({
+        where: {
+          id: id,
+          user_id: user.id
+        }
+      })
     } catch (err) {
       console.log(err);
       return null
