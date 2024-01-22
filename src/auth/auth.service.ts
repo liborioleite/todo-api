@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import { hashSync } from 'bcrypt';
 import { AuthLoginDTO } from 'src/dtos/auth.login.dto';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,7 +15,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   async register(data: CreateUserDTO) {
     try {
@@ -32,8 +33,7 @@ export class AuthService {
         data: {
           email: data.email,
           name: data.name,
-          // password: hashSync(data.password, 12),
-          password: data.password,
+          password: hashSync(data.password, 12),
         },
       });
 
@@ -45,53 +45,60 @@ export class AuthService {
     }
   }
 
-  async login(data: AuthLoginDTO) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        email: data.email,
-        password: data.password,
-      },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('E-mail e/ou senha incorretos.');
-    }
-
-    return await this.createToken(user);
-  }
-
-  async createToken(data: User) {
-    return {
-      acess_token: this.jwtService.sign(
-        {
-          // De quem pertence o token
-          id: data.id,
-          name: data.name,
+  async login(data:AuthLoginDTO): Promise<User | null> {
+    try {
+      return await this.prisma.user.findFirstOrThrow({
+        where: {
           email: data.email,
         },
-        {
-          expiresIn: '7 days',
-          // Quem tem acesso ao token
-          subject: String(data.id),
-          issuer: 'login',
-          // Quem está emitindo este token
-          audience: 'users',
-        },
-      ),
-    };
-  }
-
-  checkToken(token: string) {
-    try {
-      const data = this.jwtService.verify(token, {
-        issuer: 'login',
-        audience: 'users',
       });
-
-      return data;
     } catch (err) {
       console.log(err);
-      throw new BadGatewayException(err);
+      return null;
     }
   }
+
+  // async login(data: AuthLoginDTO) {
+  //   return await this.prisma.user.findFirstOrThrow({
+  //     where: {
+  //       email: data.email,
+  //       password: data.password,
+  //     },
+  //   });
+  // }
+
+  // async createToken(data: User) {
+  //   return {
+  //     acess_token: this.jwtService.sign(
+  //       {
+  //         // De quem pertence o token
+  //         id: data.id,
+  //         name: data.name,
+  //         email: data.email,
+  //       },
+  //       {
+  //         expiresIn: '7 days',
+  //         // Quem tem acesso ao token
+  //         subject: String(data.id),
+  //         issuer: 'login',
+  //         // Quem está emitindo este token
+  //         audience: 'users',
+  //       },
+  //     ),
+  //   };
+  // }
+
+  // checkToken(token: string) {
+  //   try {
+  //     const data = this.jwtService.verify(token, {
+  //       issuer: 'login',
+  //       audience: 'users',
+  //     });
+
+  //     return data;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw new BadGatewayException(err);
+  //   }
+  // }
 }

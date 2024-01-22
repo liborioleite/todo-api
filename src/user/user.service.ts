@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { hashSync } from 'bcrypt';
 import { CreateTaskDTO } from 'src/dtos/create.task.dto';
 import { CreateUserDTO } from 'src/dtos/create.user.dto';
 import { UpdateTaskDTO } from 'src/dtos/update.task.dto';
@@ -25,8 +26,8 @@ export class UserService {
         data: {
           email: data.email,
           name: data.name,
-          // password: hashSync(data.password, 12),
-          password: data.password,
+          password: hashSync(data.password, 12),
+          // password: data.password,
         },
       });
     } catch (err) {
