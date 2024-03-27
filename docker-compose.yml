@@ -1,0 +1,25 @@
+version: '3'
+services:
+
+  node:
+    image: node:latest
+    container_name: node-alpine
+    working_dir: /home/developer/Dev/piruletagens/todo-api
+    restart: always
+    ports:
+      - 3333:3333
+    volumes:
+      - /home/developer/Dev/todo-api:/home/node/app
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: developer
+      MYSQL_PASSWORD: developer
+      MYSQL_DATABASE: teste
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
